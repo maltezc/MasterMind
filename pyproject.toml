@@ -1,7 +1,7 @@
 [project]
-name = "mastermind-be"
+name = "mastermind_be"
 version = "0.1.0"
-description = "mastermind-be take-home challenge."
+description = "mastermind_be take-home challenge."
 dependencies = [
     "flask",
 ]
