@@ -1,12 +1,15 @@
 import os
 from flask import Flask
 from mastermind_be.database import connect_db
+from mastermind_be.config import DevelopmentConfig
 
 app = Flask(__name__)
 
 import mastermind_be.games.routes
 
 from mastermind_be.games.routes import games_routes
+
+app.config.from_object(DevelopmentConfig)
 
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 

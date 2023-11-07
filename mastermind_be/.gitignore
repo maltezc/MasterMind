@@ -1,0 +1,6 @@
+venv/
+.env
+.coverage
+
+
+.idea/dataSources.xml
