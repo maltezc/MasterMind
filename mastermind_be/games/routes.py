@@ -28,14 +28,14 @@ def create_game():
             print("value must be a whole number between 4 and 7")
             abort(400, "Value must be between 4 and 7")
 
-        # TODO: reach out to API
-        # TODO: Retrieve number
+        # Reach out to API
+        # Retrieve number
         int_generator_api_url = f"https://www.random.org/integers/?num={spaces}&min=0&max=9&col={spaces}&base=10&format=plain&rnd=new"
 
         res = requests.get(int_generator_api_url)
         generated_int = res.text.replace("\t", "").replace("\n","")
 
-        # TODO: INITIATE GAME IN DB
+        # Initiate GAME IN DB
         game = Game.create_game(
             number_to_guess=generated_int,
             spaces=spaces
@@ -70,9 +70,6 @@ def get_games():
 
     serialized = [game.serialize() for game in all_games]
     return jsonify(games=serialized), 200
-
-
-
 
 
 @games_routes.post("reset/")
