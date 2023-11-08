@@ -12,22 +12,7 @@ from mastermind_be.games.models import Game
 games_routes = Blueprint('games_routes', __name__)
 
 
-# @games_routes.route('/')
-# def hello_world():  # put application's code here
-#     return 'Hello World!'
-
-# TODO: create game
-@games_routes.get("/")
-def get_games():
-    """Retrieves all games from db"""
-
-    # TODO: add user if time.
-    all_games = Game.query.all()
-
-    serialized = [game.serialize() for game in all_games]
-    return jsonify(games=serialized), 200
-
-
+# Create
 @games_routes.post("/")
 def create_game():
     """Creating a game and initializing a db."""
@@ -62,6 +47,32 @@ def create_game():
 
     except ValueError:
         abort(500, description="Failed to create game.")
+
+
+# Read
+@games_routes.get("/<int:game_uid>")
+def get_game(game_uid):
+    """Retrieves single game by uid from db"""
+
+    # TODO: add user if time.
+    game = Game.query.get_or_404(game_uid)
+
+    serialized = game.serialize()
+    return jsonify(game=serialized), 200
+
+
+@games_routes.get("/")
+def get_games():
+    """Retrieves all games from db"""
+
+    # TODO: add user if time.
+    all_games = Game.query.all()
+
+    serialized = [game.serialize() for game in all_games]
+    return jsonify(games=serialized), 200
+
+
+
 
 
 @games_routes.post("reset/")
