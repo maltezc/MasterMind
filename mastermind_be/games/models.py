@@ -55,6 +55,7 @@ class Game(db.Model):
     )
 
     attempts = db.Relationship("Attempt", back_populates="game", uselist=True)
+
     # attempts = db.Column(
     #     db.Integer,
     #     nullable=False,
@@ -81,6 +82,17 @@ class Game(db.Model):
             number_to_guess=number_to_guess,
             spaces=spaces,
         )
+
+        db.session.add(game)
+        db.session.commit()
+
+        return game
+
+    def increment_guess(self, game_id):
+        """Increments the guesses on a game."""
+
+        game = Game.query.get_or_404(game_id)
+        game.attempts += 1
 
         db.session.add(game)
         db.session.commit()
