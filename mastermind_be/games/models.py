@@ -11,7 +11,7 @@ from mastermind_be.games.helpers.enums import GameStatusEnum
 
 # game table
 class Game(db.Model):
-    """ Listing in the system """
+    """ Games table """
 
     __tablename__ = 'games'
 
@@ -54,11 +54,12 @@ class Game(db.Model):
         default=datetime.utcnow,
     )
 
-    attempts = db.Column(
-        db.Integer,
-        nullable=False,
-        default=0
-    )
+    attempts = db.Relationship("Attempt", back_populates="game", uselist=True)
+    # attempts = db.Column(
+    #     db.Integer,
+    #     nullable=False,
+    #     default=0
+    # )
 
     def serialize(self):
         """returns self"""

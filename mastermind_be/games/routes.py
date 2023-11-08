@@ -24,7 +24,7 @@ def create_game():
     try:
         parsed_number = int(spaces)
 
-        if parsed_number < 4 or parsed_number > 7: # TODO: return this to the front end.
+        if parsed_number < 4 or parsed_number > 7:  # TODO: return this to the front end.
             print("value must be a whole number between 4 and 7")
             abort(400, "Value must be between 4 and 7")
 
@@ -33,7 +33,7 @@ def create_game():
         int_generator_api_url = f"https://www.random.org/integers/?num={spaces}&min=0&max=9&col={spaces}&base=10&format=plain&rnd=new"
 
         res = requests.get(int_generator_api_url)
-        generated_int = res.text.replace("\t", "").replace("\n","")
+        generated_int = res.text.replace("\t", "").replace("\n", "")
 
         # Initiate GAME IN DB
         game = Game.create_game(
@@ -72,6 +72,10 @@ def get_games():
     return jsonify(games=serialized), 200
 
 
+# Update
+# none
+
+# Delete
 @games_routes.post("reset/")
 def reset_game_data():
     """deletes all past game data"""
@@ -81,4 +85,4 @@ def reset_game_data():
 
     return jsonify("Reset completed"), 200
 
-# TODO: make an attempt
+
