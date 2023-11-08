@@ -20,9 +20,12 @@ class Game(db.Model):
         primary_key=True,
     )
 
+    # TODO: SET enums for status. ONGOING, WIN, LOSS
     status = db.Column(
-        SQLAlchemyEnum(GameStatusEnum, name='game_status_enum'),
-        nullable=False
+        db.Text,
+        # SQLAlchemyEnum(GameStatusEnum, name='game_status_enum'),
+        nullable=False,
+        default="ONGOING"
     )
 
     spaces = db.Column(
@@ -35,16 +38,17 @@ class Game(db.Model):
     def validate_spaces(self, key, value):
         """validates number of spaces is between 4 and 7"""
 
-        if 4 <= value <= 7:
-            raise ValueError("Spaces must be between 4 and 7")
-        return value;
+        parsed_value = int(value)
+        if 4 > parsed_value > 7:
+            raise ValueError("Number to guess must be between 4 and 7")
+        return parsed_value
 
-    number = db.Column(
+    number_to_guess = db.Column(
         db.Integer,
         nullable=False
     )
 
-    game_date_created = db.Column(
+    date_created = db.Column(
         db.DateTime,
         nullable=False,
         default=datetime.utcnow,
@@ -52,11 +56,35 @@ class Game(db.Model):
 
     attempts = db.Column(
         db.Integer,
-        nullabe=False,
+        nullable=False,
         default=0
     )
 
+    def serialize(self):
+        """returns self"""
 
+        return {
+            "id": self.id,
+            "number_to_guess": self.number_to_guess,
+            "spaces": self.spaces,
+            "status": self.status,
+            "date_created": self.date_created,
+            "attempts": self.attempts
+        }
+
+    @classmethod
+    def create_game(cls, number_to_guess, spaces):
+        """Instantiates a game with a number to guess"""
+
+        game = Game(
+            number_to_guess=number_to_guess,
+            spaces=spaces,
+        )
+
+        db.session.add(game)
+        db.session.commit()
+
+        return game
 
 
 # attempt#
