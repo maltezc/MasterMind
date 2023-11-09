@@ -2,7 +2,7 @@
 
 from flask import Blueprint, jsonify, request
 from mastermind_be.database import db
-from mastermind_be.games.helpers.general import return_serialized_game_and_message
+from mastermind_be.games.helpers.general import return_serialized_game_and_message, handle_attempts
 from mastermind_be.games.models import Game
 from werkzeug.exceptions import NotFound, abort
 
@@ -10,15 +10,15 @@ attempts_routes = Blueprint('attempts_routes', __name__)
 
 
 # TODO: make an attempt
-@attempts_routes.post("/<int:game_uid")
+@attempts_routes.post("/<int:game_uid>")
 def make_an_attempt(game_uid):
     """Makes an attempt on submitting a guess."""
 
     game = Game.query.get_or_404(game_uid)
-    number_to_guess = game.number_to_guess
+    # number_to_guess = game.number_to_guess
 
     data = request.json
-    guessed_number = data.get("number")
+    guessed_number = data.get("guess")
 
     # check length
     if len(guessed_number) != game.spaces:
@@ -37,7 +37,7 @@ def make_an_attempt(game_uid):
         attempts_count = len(game.attempts)
 
         if attempts_count > attempts_max:
-            return abort(200, "No winner, Please try again")
+            return abort(200, "No winner. Looks like we have a draw!")
 
         player1 = {
             "number": 1,
@@ -49,32 +49,10 @@ def make_an_attempt(game_uid):
             "name": game.player2_name
         }
 
-        if attempts_count == 0 or attempts_count % 2 == 0:
-            active_player = player1
-            Game.player1_increment_guess(game)
-        else:
-            active_player = player2
-            Game.player2_increment_guess(game)
+        [game_serialized, message] = handle_attempts(game, attempts_count, player1, player2, valid_guess)
+        # TODO: NEED TO RETURN ACTIVE PLAYER, MIGHT NEED TO CREATE COLUMN.
 
-        #  if yes, Celebrate and change the game status
-        if valid_guess == number_to_guess:
-
-            # increment guesses & set winner
-            if active_player["number"] == 1:
-                Game.set_winner_user1(game)
-            elif active_player["number"] == 2:
-                Game.set_winner_user2(game)
-
-            message = f"{active_player['name']}, You guessed the correct number!!"
-            return_serialized_game_and_message(game, message)
-
-        elif valid_guess > number_to_guess:
-            message = f"{active_player['name']}, your guess is too high. Guess again!"
-            return_serialized_game_and_message(game, message)
-
-        elif valid_guess < number_to_guess:
-            message = f"{active_player['name']}, your guess is too low. Guess again!"
-            return_serialized_game_and_message(game, message)
+        return jsonify(game=game_serialized, message=message), 201
 
     except ValueError:
         abort(500, description="Failed to make an attempt.")

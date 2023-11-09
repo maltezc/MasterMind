@@ -175,28 +175,6 @@ class Game(db.Model):
 
         return game
 
-    # @staticmethod
-    # def set_winner_computer(game):
-    #     """Sets the winner to user2"""
-    #
-    #     game.winner = "computer"
-    #     db.session.commit()
-    #
-    #     return game
-
-# attempt#
-
-# attempt table?
-
-# userId
-# attempt#
-# attempt time stamp
-
 # user table
 
-# userId
-# username
-# userSignupDate
-# usertotal attempts
-# usertotal Games
-# userwins
+

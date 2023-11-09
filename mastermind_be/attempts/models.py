@@ -20,7 +20,6 @@ class Attempt(db.Model):
         db.Integer,
         db.ForeignKey("games.id", ondelete="CASCADE")
     )
-
     game = db.relationship('Game', back_populates='attempts', uselist=False)
 
     guess = db.Column(
@@ -36,8 +35,6 @@ class Attempt(db.Model):
             raise ValueError("Number to guess must be a number.")
         parsed_value = int(value)
         return parsed_value
-
-
 
     date_created = db.Column(
         db.DateTime,
