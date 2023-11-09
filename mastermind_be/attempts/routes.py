@@ -31,9 +31,19 @@ def make_an_attempt(game_uid):
         # check if guessed_number matches the game_number
         valid_guess = int(guessed_number)
 
+        # TODO: CHECK attempts count.
+        attempts_max = game.players_count * 10
+        if len(game.attempts) > 20:
+            return abort(200, "No winner, Please try again")
+
+
         #  if yes, Celebrate and change the game status
         if valid_guess == number_to_guess:
+
+
+
             message = "You guessed the correct number!!"
+            Game.increment_guess(game)
 
             # increment guesses
 
@@ -47,7 +57,8 @@ def make_an_attempt(game_uid):
         elif valid_guess > number_to_guess:
             # increment guesses
             # TODO: CHANGE GAME attempts
-            game.attempts += 1
+            # game.attempts += 1
+            Game.increment_guess(game)
 
             game_serialized = game.serialize()
             message = "Your guess is too high. Guess again!"
@@ -59,7 +70,8 @@ def make_an_attempt(game_uid):
 
             # increment guesses
             # TODO: CHANGE GAME attempts
-            game.attempts -= 1
+            # game.attempts -= 1
+            Game.increment_guess(game)
 
             game_serialized = game.serialize()
             message = "Your guess is too low. Guess again!"

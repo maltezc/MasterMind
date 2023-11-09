@@ -48,6 +48,19 @@ class Game(db.Model):
         nullable=False
     )
 
+    # TODO: ADD MULTIPLAYER FUNCTIONALITY.
+    players_count = db.Column(
+        db.Integer,
+        nullable=False,
+        default=2
+    )
+
+    computer_opponent = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
+
     date_created = db.Column(
         db.DateTime,
         nullable=False,
@@ -88,13 +101,11 @@ class Game(db.Model):
 
         return game
 
-    def increment_guess(self, game_id):
-        """Increments the guesses on a game."""
+    @staticmethod
+    def increment_guess(game):
+        """Static Method to Increment the guesses on a game."""
 
-        game = Game.query.get_or_404(game_id)
         game.attempts += 1
-
-        db.session.add(game)
         db.session.commit()
 
         return game
