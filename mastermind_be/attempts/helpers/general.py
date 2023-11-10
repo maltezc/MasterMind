@@ -71,3 +71,5 @@ def set_player_game_info(game):
     }
 
     return [player1, player2]
+
+# test
