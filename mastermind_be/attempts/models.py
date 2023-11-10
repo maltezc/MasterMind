@@ -27,6 +27,11 @@ class Attempt(db.Model):
         nullable=False
     )
 
+    player_name = db.Column(
+        db.Text,
+        nullable=False,
+    )
+
     @validates("guess")
     def validate_guess(self, key, value):
         """Validates guess is a whole number and doesnt contain any special characters """
@@ -49,16 +54,18 @@ class Attempt(db.Model):
             "id": self.id,
             "game_id": self.game_id,
             "guess": self.guess,
+            "player_name": self.player_name,
             "date_created": self.date_created
         }
 
     @classmethod
-    def make_attempt(cls, game_id, guess):
+    def make_attempt(cls, game_id, guess, player_name):
         """Makes a guessing attempt"""
 
         attempt = Attempt(
             game_id=game_id,
-            guess=guess
+            guess=guess,
+            player_name=player_name
         )
 
         db.session.add(attempt)

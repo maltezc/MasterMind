@@ -2,7 +2,9 @@
 
 from flask import Blueprint, jsonify, request
 from mastermind_be.database import db
-from mastermind_be.games.helpers.general import return_serialized_game_and_message, handle_attempts
+from mastermind_be.games.helpers.general import return_serialized_game_and_message, handle_attempts, \
+    check_spaces_vs_guessed_length, guessed_is_digit
+
 from mastermind_be.games.models import Game
 from werkzeug.exceptions import NotFound, abort
 
@@ -21,12 +23,10 @@ def make_an_attempt(game_uid):
     guessed_number = data.get("guess")
 
     # check length
-    if len(guessed_number) != game.spaces:
-        return abort(400, f"Guess must be {game.spaces} numbers long!")
+    check_spaces_vs_guessed_length(guessed_number, game.spaces)
 
     # validate guessed number is a valid number.
-    if not guessed_number.isdigit():
-        return abort(400, "Not a valid number")
+    guessed_is_digit(guessed_number)
 
     try:
         # check if guessed_number matches the game_number
