@@ -45,7 +45,7 @@ class Attempt(db.Model):
     datetime_created = db.Column(
         db.DateTime,
         nullable=False,
-        default=datetime.utcnow,
+        default=datetime.now,
     )
 
     def serialize(self):
