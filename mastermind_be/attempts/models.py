@@ -36,12 +36,13 @@ class Attempt(db.Model):
     def validate_guess(self, key, value):
         """Validates guess is a whole number and doesnt contain any special characters """
 
-        if not value.isdigit():
+        if not type(value) == int:
+        # if not value.isdigit():
             raise ValueError("Number to guess must be a number.")
         parsed_value = int(value)
         return parsed_value
 
-    date_created = db.Column(
+    datetime_created = db.Column(
         db.DateTime,
         nullable=False,
         default=datetime.utcnow,
@@ -55,7 +56,7 @@ class Attempt(db.Model):
             "game_id": self.game_id,
             "guess": self.guess,
             "player_name": self.player_name,
-            "date_created": self.date_created
+            "datetime_created": self.datetime_created
         }
 
     @classmethod

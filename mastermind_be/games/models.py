@@ -39,12 +39,12 @@ class Game(db.Model):
         default=0
     )
 
-    # TODO: SET enums for status. ONGOING, WIN, LOSS
+    # TODO: SET enums for status. ACTIVE, COMPLETED
     status = db.Column(
         db.Text,
         # SQLAlchemyEnum(GameStatusEnum, name='game_status_enum'),
         nullable=False,
-        default="ONGOING"
+        default="ACTIVE"
     )
 
     winner = db.Column(
@@ -85,10 +85,15 @@ class Game(db.Model):
         default=True
     )
 
-    date_created = db.Column(
+    datetime_created = db.Column(
         db.DateTime,
         nullable=False,
         default=datetime.utcnow,
+    )
+
+    datetime_completed = db.Column(
+        db.DateTime,
+        nullable=True
     )
 
     attempts = db.Relationship("Attempt", back_populates="game", uselist=True)
@@ -102,16 +107,22 @@ class Game(db.Model):
     def serialize(self):
         """returns self"""
 
+        serialized_attempts = [attempt.serialize() for attempt in self.attempts]
+
         return {
             "id": self.id,
             "number_to_guess": self.number_to_guess,
             "spaces": self.spaces,
             "player1_name": self.player1_name,
+            "player1_guesses_count": self.player1_guesses_count,
             "player2_name": self.player2_name,
+            "player2_guesses_count": self.player2_guesses_count,
+            "computer_opponent": self.computer_opponent,
             "winner": self.winner,
             "status": self.status,
-            "date_created": self.date_created,
-            "attempts": self.attempts
+            "datetime_created": self.datetime_created,
+            "datetime_completed": self.datetime_completed,
+            "attempts": serialized_attempts
         }
 
     @classmethod
@@ -153,27 +164,29 @@ class Game(db.Model):
         """Sets the game status to completed"""
 
         game.status = "COMPLETED"
+        game.datetime_completed = datetime.utcnow()
+
         db.session.commit()
 
         return game
 
     @staticmethod
-    def set_winner_user1(game):
+    def set_winner_user1(game, player_name):
         """Sets the winner to user1"""
 
-        game.winner = "user1"
+        game.winner = player_name
         db.session.commit()
 
         return game
 
-    @staticmethod
-    def set_winner_user2(game):
-        """Sets the winner to user2"""
-
-        game.winner = "user2"
-        db.session.commit()
-
-        return game
+    # @staticmethod
+    # def set_winner_user2(game):
+    #     """Sets the winner to user2"""
+    #
+    #     game.winner = "user2"
+    #     db.session.commit()
+    #
+    #     return game
 
 # user table
 

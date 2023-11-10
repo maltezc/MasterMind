@@ -79,6 +79,28 @@ def get_games():
     return jsonify(games=serialized), 200
 
 
+# get active games
+@games_routes.get("/active")
+def get_active_games():
+    """Retrieves all active games from db"""
+
+    active_games = Game.query.filter(Game.status == "ACTIVE").order_by(Game.datetime_created.desc()).all()
+
+    serialized = [game.serialize() for game in active_games]
+    return jsonify(games=serialized), 200
+
+
+# get completed games
+@games_routes.get("/completed")
+def get_completed_games():
+    """Retrieves all active games from db"""
+
+    # city1.state = State.query.filter(State.state_abbreviation == "CA").first()
+    completed_games = Game.query.filter(Game.status == "COMPLETED")
+
+    serialized = [game.serialize() for game in completed_games]
+    return jsonify(games=serialized), 200
+
 # Update
 # none
 
