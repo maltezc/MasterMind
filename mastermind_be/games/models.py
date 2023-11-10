@@ -88,7 +88,7 @@ class Game(db.Model):
     datetime_created = db.Column(
         db.DateTime,
         nullable=False,
-        default=datetime.utcnow,
+        default=datetime.now,
     )
 
     datetime_completed = db.Column(
@@ -164,7 +164,7 @@ class Game(db.Model):
         """Sets the game status to completed"""
 
         game.status = "COMPLETED"
-        game.datetime_completed = datetime.utcnow()
+        game.datetime_completed = datetime.now()
 
         db.session.commit()
 
