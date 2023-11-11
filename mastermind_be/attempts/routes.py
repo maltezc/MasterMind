@@ -22,23 +22,25 @@ def make_an_attempt(game_uid):
 
     if game.status == "COMPLETED":
         game_serialized = game.serialize()
-        message = f"This game is already completed. {game.winner} won! Please make a guess on another game."
-        return jsonify(game=game_serialized, message=message), 201
+
+        game_winner = "No one" if game.winner is None else game.winner
+        message = f"This game is already completed. {game_winner} won! Please make a guess on another game."
+        return jsonify(game=game_serialized, message=message), 200
 
     data = request.json
     guessed_number = data.get("guess")
 
-    check_spaces_vs_guessed_length(guessed_number, game.spaces)
+    check_spaces_vs_guessed_length(game, guessed_number, game.spaces)
 
-    guessed_is_digit(guessed_number)
+    guessed_is_digit(game, guessed_number)
+
+    attempts_max = game.players_count * 10
+    attempts_count = len(game.attempts)
+
+    check_is_draw(game, attempts_count, attempts_max)
 
     try:
         valid_guess = int(guessed_number)
-
-        attempts_max = game.players_count * 10
-        attempts_count = len(game.attempts)
-
-        check_is_draw(attempts_count, attempts_max)
 
         [player1, player2] = set_player_game_info(game)
 

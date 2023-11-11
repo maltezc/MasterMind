@@ -4,8 +4,7 @@ from mastermind_be.attempts.models import Attempt
 from mastermind_be.games.models import Game
 
 
-# TODO: SET UP COMPUTER GESSING ON 2 SECOND TIMER.
-
+# TODO: SET UP COMPUTER GuESSING ON 2 SECOND TIMER.
 def handle_attempts(game, attempts_count, player1, player2, valid_guess):
     """Handles an attempt being made."""
 
@@ -13,10 +12,17 @@ def handle_attempts(game, attempts_count, player1, player2, valid_guess):
         active_player = player1
         Game.player1_increment_guess(game)
         Attempt.make_attempt(game.id, valid_guess, player1["name"])
+
     else:
         active_player = player2
         Game.player2_increment_guess(game)
         Attempt.make_attempt(game.id, valid_guess, player2["name"])
+
+    attempts_max = game.players_count * 10
+    attempts_count = len(game.attempts)
+
+    if attempts_count >= attempts_max:
+        Game.set_status_completed(game)
 
     winner_bool = False
 
@@ -29,7 +35,6 @@ def handle_attempts(game, attempts_count, player1, player2, valid_guess):
         if active_player["number"] == 1:
             Game.set_winner_user1(game, player1["name"])
         elif active_player["number"] == 2:
-            # Game.set_winner_user2(game, player2["name"])
             Game.set_winner_user1(game, player2["name"])
 
         winner_bool = True
@@ -39,10 +44,20 @@ def handle_attempts(game, attempts_count, player1, player2, valid_guess):
 
     # TODO: check positions - The player had guessed a correct number and its correct location
     # split the guess and the game number.
-    check_positions(valid_guess, number_to_guess) # TODO: test this.
-
-
     # check positions against eachother.
+    [correct_counter, found_numbers] = check_positions(valid_guess, number_to_guess) # TODO: test this.
+
+    # TODO: RETURN MESSAGE
+    # “1 correct number and 1 correct location”
+    correct_number_count = correct_counter["number"]
+    numbers_word = 'number' if correct_number_count == 1 else 'numbers'
+
+    correct_location_count = correct_counter["location"]
+    locations_word = 'location' if correct_location_count == 1 else 'locations'
+    message = f"{correct_number_count} correct {numbers_word} and {correct_location_count} correct {locations_word}"
+
+    [game_serialized, message] = return_serialized_game_and_message(game, message, winner_bool)
+    return [game_serialized, message]
 
 
     # elif valid_guess > number_to_guess:
@@ -94,8 +109,8 @@ def check_positions(guess, game_number):
         Player guesses “2 2 1 1”, game responds “1 correct number and 0 correct location”
         Player guesses “0 1 5 6”, game responds “3 correct numbers and 2 correct location”'''
 
-    guess_splits = guess.split()
-    game_number_splits = game_number.split()
+    guess_splits = list(str(guess))
+    game_number_splits = list(str(game_number))
 
     correct_counter = {
         "number": 0,
@@ -105,18 +120,18 @@ def check_positions(guess, game_number):
     found_numbers = {}
 
     #  could use for loop to check for numbers?
-    for i, num  in enumerate(guess_splits) :
+    for i, num in enumerate(guess_splits):
         if guess_splits[i] == game_number_splits[i]: # if numbers match
             # increment correct NUmber and location counter
-            correct_counter["number"] =+1
-            correct_counter["location"] =+1
+            correct_counter["number"] += 1
+            correct_counter["location"] += 1
 
             found_numbers[num] = 1
             # if both numbers match game number length, its a win
         # use some kind of dictionary counter.
-        if guess_splits[i] in game_number_splits:
+        elif guess_splits[i] in game_number_splits:
             found_numbers[num] = 1
-            correct_counter["number"] = +1
+            correct_counter["number"] += 1
 
     return [correct_counter, found_numbers]
 
