@@ -48,13 +48,16 @@ def handle_attempts(game, attempts_count, player1, player2, valid_guess):
     [correct_counter, found_numbers] = check_positions(valid_guess, number_to_guess) # TODO: test this.
 
     # TODO: RETURN MESSAGE
-    # “1 correct number and 1 correct location”
-    correct_number_count = correct_counter["number"]
-    numbers_word = 'number' if correct_number_count == 1 else 'numbers'
 
-    correct_location_count = correct_counter["location"]
-    locations_word = 'location' if correct_location_count == 1 else 'locations'
-    message = f"{correct_number_count} correct {numbers_word} and {correct_location_count} correct {locations_word}"
+    if correct_counter["number"] == 0 and correct_counter["location"] == 0:
+        message = "All incorrect"
+    else:
+        correct_number_count = correct_counter["number"]
+        numbers_word = 'number' if correct_number_count == 1 else 'numbers'
+
+        correct_location_count = correct_counter["location"]
+        locations_word = 'location' if correct_location_count == 1 else 'locations'
+        message = f"{correct_number_count} correct {numbers_word} and {correct_location_count} correct {locations_word}"
 
     [game_serialized, message] = return_serialized_game_and_message(game, message, winner_bool)
     return [game_serialized, message]
