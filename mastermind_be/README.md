@@ -15,3 +15,7 @@
 5) Create psql database named: `mastermind`
 6) Run `flask --app mastermind_be run` in outer mastermind_be
 
+
+### Bug Journal
+- Working with new BluePrint version and setting up.
+- 
