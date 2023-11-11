@@ -3,9 +3,7 @@
 from flask import Blueprint, jsonify, request
 
 from mastermind_be.attempts.helpers.checks import check_is_draw, check_spaces_vs_guessed_length, guessed_is_digit
-from mastermind_be.attempts.helpers.general import set_player_game_info, handle_attempts
-from mastermind_be.database import db
-
+from mastermind_be.attempts.helpers.general import set_player_game_info, handle_attempts, return_other_games
 
 from mastermind_be.games.models import Game
 from werkzeug.exceptions import NotFound, abort
@@ -13,12 +11,24 @@ from werkzeug.exceptions import NotFound, abort
 attempts_routes = Blueprint('attempts_routes', __name__)
 
 
-# TODO: make an attempt
 @attempts_routes.post("/<int:game_uid>")
 def make_an_attempt(game_uid):
     """Makes an attempt on submitting a guess."""
 
-    game = Game.query.get_or_404(game_uid)
+    data = request.json
+    guessed_number = data.get("guess")
+
+    try:
+        valid_guess = int(guessed_number)
+        # return valid_guess
+    except ValueError as error:
+        return jsonify("The value you entered is not considered an integer. Please enter a value only containing "
+                       "numbers.")
+
+    game = Game.query.get(game_uid)
+    if game is None:
+        message = return_other_games(game_uid)
+        return jsonify(message)
 
     if game.status == "COMPLETED":
         game_serialized = game.serialize()
@@ -27,11 +37,7 @@ def make_an_attempt(game_uid):
         message = f"This game is already completed. {game_winner} won! Please make a guess on another game."
         return jsonify(game=game_serialized, message=message), 200
 
-    data = request.json
-    guessed_number = data.get("guess")
-
     check_spaces_vs_guessed_length(game, guessed_number, game.spaces)
-
     guessed_is_digit(game, guessed_number)
 
     attempts_max = game.players_count * 10
@@ -39,13 +45,10 @@ def make_an_attempt(game_uid):
 
     check_is_draw(game, attempts_count, attempts_max)
 
+    [player1, player2] = set_player_game_info(game)
+
     try:
-        valid_guess = int(guessed_number)
-
-        [player1, player2] = set_player_game_info(game)
-
-        [game_serialized, message] = handle_attempts(game, attempts_count, player1, player2, valid_guess)
-
+        [game_serialized, message] = handle_attempts(game, attempts_count, attempts_max, player1, player2, valid_guess)
         return jsonify(game=game_serialized, message=message), 201
 
     except ValueError:

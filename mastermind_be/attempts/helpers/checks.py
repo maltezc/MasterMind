@@ -27,3 +27,6 @@ def check_is_draw(game, attempts_count, attempts_max):
         game_serialized = game.serialize()
         message = "Max number of attempts have been reached. Try another game!"
         return jsonify(game=game_serialized, message=message), 200
+
+
+

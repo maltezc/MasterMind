@@ -7,7 +7,7 @@ from werkzeug.exceptions import NotFound, abort
 
 from mastermind_be.database import db
 from mastermind_be.games.models import Game
-from mastermind_be.games.helpers.general import nuke_db
+from mastermind_be.games.helpers.general import nuke_db, return_active_games
 
 # from mastermind_be.attempts.models import Attempt
 
@@ -30,11 +30,8 @@ def create_game():
         parsed_number = int(spaces)
 
         if parsed_number < 4 or parsed_number > 7:  # TODO: return this to the front end.
-            print("value must be a whole number between 4 and 7")
-            abort(400, "Value must be between 4 and 7")
+            return jsonify("Value must be between 4 and 7")
 
-        # Reach out to API
-        # Retrieve number
         int_generator_api_url = f"https://www.random.org/integers/?num={spaces}&min=0&max=9&col={spaces}&base=10&format=plain&rnd=new"
 
         res = requests.get(int_generator_api_url)
@@ -50,7 +47,6 @@ def create_game():
 
         serialized = game.serialize()
         return jsonify(game=serialized), 201
-        # return f"creating a game with {generated_int}"
 
     except ValueError:
         abort(500, description="Failed to create game.")
@@ -84,7 +80,7 @@ def get_games():
 def get_active_games():
     """Retrieves all active games from db"""
 
-    active_games = Game.query.filter(Game.status == "ACTIVE").order_by(Game.datetime_created.desc()).all()
+    active_games = return_active_games()
 
     serialized = [game.serialize() for game in active_games]
     return jsonify(games=serialized), 200
