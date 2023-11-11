@@ -102,12 +102,12 @@ def set_player_game_info(game):
 def check_positions(guess, game_number):
     """Check's positions of numbers from the guessed number against the game_number."""
 
-    '''Example Run:
-        Game initializes and selects “0 1 3 5”
-        Player guesses “2 2 4 6”, game responds “all incorrect”
-        Player guesses “0 2 4 6”, game responds “1 correct number and 1 correct location”
-        Player guesses “2 2 1 1”, game responds “1 correct number and 0 correct location”
-        Player guesses “0 1 5 6”, game responds “3 correct numbers and 2 correct location”'''
+    # Example Run:
+    #     Game initializes and selects “0 1 3 5”
+    #     Player guesses “2 2 4 6”, game responds “all incorrect”
+    #     Player guesses “0 2 4 6”, game responds “1 correct number and 1 correct location”
+    #     Player guesses “2 2 1 1”, game responds “1 correct number and 0 correct location”
+    #     Player guesses “0 1 5 6”, game responds “3 correct numbers and 2 correct location”
 
     guess_splits = list(str(guess))
     game_number_splits = list(str(game_number))
