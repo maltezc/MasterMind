@@ -84,7 +84,6 @@ def get_games():
 def get_active_games():
     """Retrieves all active games from db"""
 
-    # active_games = db.session.query(Game).filter(Game.status == "ACTIVE").order_by(Game.datetime_created.desc()).all()
     active_games = Game.query.filter(Game.status == "ACTIVE").order_by(Game.datetime_created.desc()).all()
 
     serialized = [game.serialize() for game in active_games]
@@ -96,8 +95,7 @@ def get_active_games():
 def get_completed_games():
     """Retrieves all active games from db"""
 
-    # city1.state = State.query.filter(State.state_abbreviation == "CA").first()
-    completed_games = Game.query.filter(Game.status == "COMPLETED")
+    completed_games = Game.query.filter(Game.status == "COMPLETED").order_by(Game.datetime_completed.desc()).all()
 
     serialized = [game.serialize() for game in completed_games]
     return jsonify(games=serialized), 200
