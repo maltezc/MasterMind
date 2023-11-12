@@ -15,6 +15,7 @@ def return_active_games():
     active_games = Game.query.filter(Game.status == "ACTIVE").order_by(Game.datetime_created.desc()).all()
     return active_games
 
+
 def nuke_db():
     """Deletes all tables in db to prep for reset."""
 

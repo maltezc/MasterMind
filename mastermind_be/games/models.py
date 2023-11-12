@@ -30,7 +30,7 @@ class Game(db.Model):
 
     player2_name = db.Column(
         db.Text,
-        nullable=False
+        nullable=True
     )
 
     player2_guesses_count = db.Column(
@@ -78,17 +78,16 @@ class Game(db.Model):
         nullable=False
     )
 
-    # TODO: ADD MULTIPLAYER FUNCTIONALITY.
     players_count = db.Column(
         db.Integer,
         nullable=False,
-        default=2
+        default=1
     )
 
-    computer_opponent = db.Column(
+    multiplayer = db.Column(
         db.Boolean,
         nullable=False,
-        default=True
+        default=False
     )
 
     datetime_created = db.Column(
@@ -104,12 +103,6 @@ class Game(db.Model):
 
     attempts = db.Relationship("Attempt", back_populates="game", uselist=True)
 
-    # attempts = db.Column(
-    #     db.Integer,
-    #     nullable=False,
-    #     default=0
-    # )
-
     def serialize(self):
         """returns self"""
 
@@ -124,7 +117,7 @@ class Game(db.Model):
             "player1_guesses_count": self.player1_guesses_count,
             "player2_name": self.player2_name,
             "player2_guesses_count": self.player2_guesses_count,
-            "computer_opponent": self.computer_opponent,
+            "multiplayer": self.multiplayer,
             "winner": self.winner,
             "status": self.status,
             "datetime_created": self.datetime_created,
