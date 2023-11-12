@@ -18,6 +18,7 @@
 
 ### Bug Journal
 - Working with new BluePrint version and setting up.
+- Leading 0s issue: example - DB number_to_guess showing 373 instead of 0372. This happened because the DB type was set to int instead of a string value.  
 
 ### Refresh / New Topics
 - Static methods vs class methods

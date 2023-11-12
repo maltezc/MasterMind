@@ -47,6 +47,7 @@ def make_an_attempt(game_uid):
 
     if not game.multiplayer:
         player1 = set_single_player_game_info(game)
+        player2 = None
     else:
         [player1, player2] = set_multiplayer_game_info(game)
 

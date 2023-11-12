@@ -41,7 +41,7 @@ def handle_attempts(game, attempts_count, attempts_max,  player1, player2, valid
             Game.player2_increment_guess(game)
             Attempt.make_attempt(game.id, valid_guess, player2["name"])
 
-    if attempts_count >= attempts_max:
+    if attempts_count >= attempts_max - 1:
         Game.set_status_completed(game)
 
     winner_bool = False
