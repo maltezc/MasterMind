@@ -18,4 +18,10 @@
 
 ### Bug Journal
 - Working with new BluePrint version and setting up.
-- 
+
+### Refresh / New Topics
+- Static methods vs class methods
+- New Blueprint Version
+
+### TODO
+- write tests
