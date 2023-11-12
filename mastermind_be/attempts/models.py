@@ -48,6 +48,11 @@ class Attempt(db.Model):
         default=datetime.now,
     )
 
+    hint = db.Column(
+        db.Text,
+        nullable=False,
+    )
+
     def serialize(self):
         """Returns self"""
 
@@ -56,26 +61,22 @@ class Attempt(db.Model):
             "game_id": self.game_id,
             "guess": self.guess,
             "player_name": self.player_name,
-            "datetime_created": self.datetime_created
+            "datetime_created": self.datetime_created,
+            "hint": self.hint
         }
 
     @classmethod
-    def make_attempt(cls, game_id, guess, player_name):
+    def make_attempt(cls, game_id, guess, player_name, hint):
         """Makes a guessing attempt"""
 
         attempt = Attempt(
             game_id=game_id,
             guess=guess,
-            player_name=player_name
+            player_name=player_name,
+            hint=hint
         )
 
         db.session.add(attempt)
         db.session.commit()
 
         return attempt
-
-        # try:
-        #     # confirm is int, is not string, and contains no special characters.
-        #
-        # except ValueError as error:
-        #     abort(400, "enter a valid value")
