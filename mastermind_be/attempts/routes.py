@@ -61,7 +61,11 @@ def get_past_attempts(game_uid):
     """Gets past attempts hints for the game."""
 
     past_attempts = Attempt.query.filter(Attempt.game_id == game_uid).order_by(Attempt.datetime_created.desc()).all()
-
     hints_info = [[attempt.guess, attempt.hint] for attempt in past_attempts]
 
-    return jsonify(hints=hints_info)
+    game = Game.query.get(game_uid)
+    attempts_max = game.players_count * 10
+
+    attempts_remaining = attempts_max - len(game.attempts)
+
+    return jsonify(hints=hints_info, attempts_remaining=attempts_remaining)
