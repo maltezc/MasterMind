@@ -1,18 +1,32 @@
 """Game routes"""
 
-import os
 import requests
 from flask import Blueprint, jsonify, request
-from werkzeug.exceptions import NotFound, abort
+from werkzeug.exceptions import abort
 
 from mastermind_be.database import db
-from mastermind_be.games.models import Game
 from mastermind_be.games.helpers.general import nuke_db, return_active_games
-
-# from mastermind_be.attempts.models import Attempt
-
+from mastermind_be.games.models import Game
+import random
 
 games_routes = Blueprint('games_routes', __name__)
+
+easy = {
+    "url": "https://www.random.org/integers/?num=32&min=0&max=7&col=4&base=10&format=plain&rnd=new",
+    "spaces": '4'
+}
+
+medium = {"url": "https://www.random.org/integers/?num=40&min=0&max=7&col=5&base=10&format=plain&rnd=new",
+          "spaces": "5"
+          }
+
+hard = {"url": "https://www.random.org/integers/?num=48&min=0&max=7&col=6&base=10&format=plain&rnd=new",
+          "spaces": "6"
+          }
+
+legendary = {"url": "https://www.random.org/integers/?num=56&min=0&max=7&col=7&base=10&format=plain&rnd=new",
+             "spaces": "7"
+             }
 
 
 # Create
@@ -22,25 +36,38 @@ def create_game():
 
     # TODO: GET USER INPUT
     data = request.json
-    spaces = data.get('spaces')
+    # spaces = data.get('spaces')
+    difficulty = data.get("difficulty", "easy")
     player1_name = data.get('player1_name')
     player2_name = data.get('player2_name')
 
     try:
-        parsed_number = int(spaces)
+        int_generator_api_url = None
+        spaces = 4
 
-        if parsed_number < 4 or parsed_number > 7:  # TODO: return this to the front end.
-            return jsonify("Value must be between 4 and 7")
-
-        int_generator_api_url = f"https://www.random.org/integers/?num={spaces}&min=0&max=9&col={spaces}&base=10&format=plain&rnd=new"
+        match difficulty:
+            case "easy":
+                int_generator_api_url = easy["url"]
+                spaces = 4
+            case "medium":
+                int_generator_api_url = medium["url"]
+                spaces = 5
+            case "hard":
+                int_generator_api_url = hard["url"]
+                spaces = 6
+            case "legendary":
+                int_generator_api_url = legendary["url"]
+                spaces = 7
 
         res = requests.get(int_generator_api_url)
-        generated_int = res.text.replace("\t", "").replace("\n", "")
+        generated_numbers = res.text.replace("\t", "").split("\n")
+        selected_num = random.choice(generated_numbers)
 
         # Initiate GAME IN DB
         game = Game.create_game(
-            number_to_guess=generated_int,
+            number_to_guess=selected_num,
             spaces=spaces,
+            difficulty=difficulty,
             player1_name=player1_name,
             player2_name=player2_name,
         )

@@ -58,6 +58,12 @@ class Game(db.Model):
         nullable=False
     )
 
+    difficulty = db.Column(
+        db.Text,
+        default="easy",
+        nullable=False
+    )
+
     @validates("spaces")
     def validate_spaces(self, key, value):
         """validates number of spaces is between 4 and 7"""
@@ -113,6 +119,7 @@ class Game(db.Model):
             "id": self.id,
             "number_to_guess": self.number_to_guess,
             "spaces": self.spaces,
+            "difficulty": self.difficulty,
             "player1_name": self.player1_name,
             "player1_guesses_count": self.player1_guesses_count,
             "player2_name": self.player2_name,
@@ -126,12 +133,13 @@ class Game(db.Model):
         }
 
     @classmethod
-    def create_game(cls, number_to_guess, spaces, player1_name, player2_name):
+    def create_game(cls, number_to_guess, spaces, difficulty, player1_name, player2_name):
         """Instantiates a game with a number to guess"""
 
         game = Game(
             number_to_guess=number_to_guess,
             spaces=spaces,
+            difficulty=difficulty,
             player1_name=player1_name,
             player2_name=player2_name
         )
@@ -178,15 +186,6 @@ class Game(db.Model):
         db.session.commit()
 
         return game
-
-    # @staticmethod
-    # def set_winner_user2(game):
-    #     """Sets the winner to user2"""
-    #
-    #     game.winner = "user2"
-    #     db.session.commit()
-    #
-    #     return game
 
 # user table
 
