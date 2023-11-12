@@ -6,8 +6,16 @@ from mastermind_be.games.models import Game
 
 
 def correct_number_guessed(game, active_player, player1, player2):
-    """Sets the appropriate winner, and returns game serialized and appropriate message if the correct number is
-    guessed."""
+    """
+    Sets the appropriate winner, and returns game serialized and appropriate message if the correct number is
+    guessed.
+
+    :param game:
+    :param active_player:
+    :param player1:
+    :param player2:
+    :return:
+    """
 
     # increment guesses & set winner
     if active_player["number"] == 1:
@@ -21,45 +29,84 @@ def correct_number_guessed(game, active_player, player1, player2):
     return [game_serialized, message]
 
 
-def handle_attempts(game, attempts_count, attempts_max,  player1, player2, valid_guess):
-    """Handles an attempt being made."""
+def get_active_player(game, attempts_count, player1, player2):
+    """
+    If single player game, return single player as active player. If multiplayer, return active_player based on attempts.
 
-    active_player = None
+    :param game:
+    :param attempts_count:
+    :param player1:
+    :param player2:
+    :return:
+    """
 
     if not game.multiplayer:
         active_player = player1
-        Game.player1_increment_guess(game)
-        Attempt.make_attempt(game.id, valid_guess, player1["name"])
-
+        return active_player
     elif game.multiplayer:
         if attempts_count == 0 or attempts_count % 2 == 0:
             active_player = player1
-            Game.player1_increment_guess(game)
-            Attempt.make_attempt(game.id, valid_guess, player1["name"])
+            return active_player
         else:
             active_player = player2
-            Game.player2_increment_guess(game)
-            Attempt.make_attempt(game.id, valid_guess, player2["name"])
+            return active_player
 
-    if attempts_count >= attempts_max - 1:
-        Game.set_status_completed(game)
+
+def increment_attempt(game, attempts_count, player1, player2, valid_guess, message):
+    """
+    Make an attempt and increment game attempts.
+
+    :param game:
+    :param attempts_count:
+    :param player1:
+    :param player2:
+    :param valid_guess:
+    :param message:
+    :return:
+    """
+
+    if not game.multiplayer:
+        Game.player1_increment_guess(game)
+        Attempt.make_attempt(game.id, valid_guess, player1["name"], message)
+    elif game.multiplayer:
+        if attempts_count == 0 or attempts_count % 2 == 0:
+            Game.player1_increment_guess(game)
+            Attempt.make_attempt(game.id, valid_guess, player1["name"], message)
+        else:
+            Game.player2_increment_guess(game)
+            Attempt.make_attempt(game.id, valid_guess, player2["name"], message)
+
+
+def handle_attempts(game, attempts_count, attempts_max,  player1, player2, valid_guess):
+    """Handles an attempt being made."""
 
     winner_bool = False
     number_to_guess = game.number_to_guess
+
+    active_player = get_active_player(game, attempts_count, player1, player2)
 
     if valid_guess == number_to_guess:
         correct_number_guessed(game, active_player, player1, player2)
 
     correct_counter = check_positions(valid_guess, number_to_guess)
-
     message = resolve_message(correct_counter)
+
+    increment_attempt(game, attempts_count, player1, player2, valid_guess, message)
+
+    if attempts_count >= attempts_max - 1:
+        Game.set_status_completed(game)
 
     [game_serialized, message] = return_serialized_game_and_message(game, message, winner_bool)
     return [game_serialized, message]
 
 
 def resolve_message(correct_counter):
-    """Assesses correct_number and returns message accordingly"""
+    """
+    Assesses correct_number and returns message accordingly
+
+    :param correct_counter:
+    :return:
+    """
 
     if correct_counter["number"] == 0 and correct_counter["location"] == 0:
         message = "All incorrect"
@@ -93,7 +140,11 @@ def return_serialized_game_and_message(game, message, winner_bool):
 
 
 def set_single_player_game_info(game):
-    """Sets the player info for a single player game"""
+    """
+    Sets the player info for a single player game
+    :param game:
+    :return:
+    """
 
     player1 = {
         "number": 1,
@@ -104,7 +155,12 @@ def set_single_player_game_info(game):
 
 
 def set_multiplayer_game_info(game):
-    """Sets the player info for a multiplayer game"""
+    """
+    Sets the player info for a multiplayer game
+
+    :param game:
+    :return:
+    """
 
     player1 = {
         "number": 1,
@@ -147,8 +203,14 @@ def enumerate_and_check_splits(guess_splits, game_number_splits, correct_counter
 
 
 def check_positions(guess, game_number):
-    """Check's positions of numbers from the guessed number against the game_number. Returns correct_counter
-    dictionary that holds record of how many correct numbers and locations."""
+    """
+    Check's positions of numbers from the guessed number against the game_number. Returns correct_counter
+    dictionary that holds record of how many correct numbers and locations.
+
+    :param guess:
+    :param game_number:
+    :return:
+    """
 
     # Example Run:
     #     Game initializes and selects “0 1 3 5”
@@ -192,3 +254,20 @@ def return_other_games(game_uid):
         active_game_message = " Try creating a new game!"
 
     return f"Game #{game_uid} does not exist.{active_game_message}"
+
+
+def set_game_info(game):
+    """
+    Sets game info according to single player or multiplayer
+
+    :param game:
+    :return:
+    """
+
+    if not game.multiplayer:
+        player1 = set_single_player_game_info(game)
+        player2 = None
+    else:
+        [player1, player2] = set_multiplayer_game_info(game)
+
+    return [player1, player2]
