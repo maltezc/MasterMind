@@ -3,7 +3,8 @@
 from flask import Blueprint, jsonify, request
 
 from mastermind_be.attempts.helpers.checks import check_is_draw, check_spaces_vs_guessed_length, guessed_is_digit
-from mastermind_be.attempts.helpers.general import set_player_game_info, handle_attempts, return_other_games
+from mastermind_be.attempts.helpers.general import set_multiplayer_game_info, handle_attempts, return_other_games, \
+    set_single_player_game_info
 
 from mastermind_be.games.models import Game
 from werkzeug.exceptions import NotFound, abort
@@ -20,7 +21,6 @@ def make_an_attempt(game_uid):
 
     try:
         valid_guess = int(guessed_number)
-        # return valid_guess
     except ValueError as error:
         return jsonify("The value you entered is not considered an integer. Please enter a value only containing "
                        "numbers.")
@@ -45,7 +45,11 @@ def make_an_attempt(game_uid):
 
     check_is_draw(game, attempts_count, attempts_max)
 
-    [player1, player2] = set_player_game_info(game)
+    if not game.multiplayer:
+        player1 = set_single_player_game_info(game)
+        player2 = None
+    else:
+        [player1, player2] = set_multiplayer_game_info(game)
 
     try:
         [game_serialized, message] = handle_attempts(game, attempts_count, attempts_max, player1, player2, valid_guess)

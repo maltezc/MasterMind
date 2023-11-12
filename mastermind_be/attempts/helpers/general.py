@@ -5,7 +5,6 @@ from mastermind_be.games.helpers.general import return_active_games
 from mastermind_be.games.models import Game
 
 
-# TODO: SET UP COMPUTER GUESSING ON 2 SECOND TIMER.
 def correct_number_guessed(game, active_player, player1, player2):
     """Sets the appropriate winner, and returns game serialized and appropriate message if the correct number is
     guessed."""
@@ -25,17 +24,24 @@ def correct_number_guessed(game, active_player, player1, player2):
 def handle_attempts(game, attempts_count, attempts_max,  player1, player2, valid_guess):
     """Handles an attempt being made."""
 
-    if attempts_count == 0 or attempts_count % 2 == 0:
+    active_player = None
+
+    if not game.multiplayer:
         active_player = player1
         Game.player1_increment_guess(game)
         Attempt.make_attempt(game.id, valid_guess, player1["name"])
 
-    else:
-        active_player = player2
-        Game.player2_increment_guess(game)
-        Attempt.make_attempt(game.id, valid_guess, player2["name"])
+    elif game.multiplayer:
+        if attempts_count == 0 or attempts_count % 2 == 0:
+            active_player = player1
+            Game.player1_increment_guess(game)
+            Attempt.make_attempt(game.id, valid_guess, player1["name"])
+        else:
+            active_player = player2
+            Game.player2_increment_guess(game)
+            Attempt.make_attempt(game.id, valid_guess, player2["name"])
 
-    if attempts_count >= attempts_max:
+    if attempts_count >= attempts_max - 1:
         Game.set_status_completed(game)
 
     winner_bool = False
@@ -86,8 +92,19 @@ def return_serialized_game_and_message(game, message, winner_bool):
     return [game_serialized, message]
 
 
-def set_player_game_info(game):
-    """Sets the player info for the game in dictionaries"""
+def set_single_player_game_info(game):
+    """Sets the player info for a single player game"""
+
+    player1 = {
+        "number": 1,
+        "name": game.player1_name
+    }
+
+    return player1
+
+
+def set_multiplayer_game_info(game):
+    """Sets the player info for a multiplayer game"""
 
     player1 = {
         "number": 1,

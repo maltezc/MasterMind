@@ -12,19 +12,19 @@ import random
 games_routes = Blueprint('games_routes', __name__)
 
 easy = {
-    "url": "https://www.random.org/integers/?num=32&min=0&max=7&col=4&base=10&format=plain&rnd=new",
+    "url": "https://www.random.org/integers/?num=4&min=0&max=7&col=4&base=10&format=plain&rnd=new",
     "spaces": '4'
 }
 
-medium = {"url": "https://www.random.org/integers/?num=40&min=0&max=7&col=5&base=10&format=plain&rnd=new",
+medium = {"url": "https://www.random.org/integers/?num=5&min=0&max=7&col=5&base=10&format=plain&rnd=new",
           "spaces": "5"
           }
 
-hard = {"url": "https://www.random.org/integers/?num=48&min=0&max=7&col=6&base=10&format=plain&rnd=new",
+hard = {"url": "https://www.random.org/integers/?num=6&min=0&max=7&col=6&base=10&format=plain&rnd=new",
           "spaces": "6"
           }
 
-legendary = {"url": "https://www.random.org/integers/?num=56&min=0&max=7&col=7&base=10&format=plain&rnd=new",
+legendary = {"url": "https://www.random.org/integers/?num=7&min=0&max=7&col=7&base=10&format=plain&rnd=new",
              "spaces": "7"
              }
 
@@ -34,12 +34,10 @@ legendary = {"url": "https://www.random.org/integers/?num=56&min=0&max=7&col=7&b
 def create_game():
     """Creating a game and initializing a db."""
 
-    # TODO: GET USER INPUT
     data = request.json
-    # spaces = data.get('spaces')
     difficulty = data.get("difficulty", "easy")
     player1_name = data.get('player1_name')
-    player2_name = data.get('player2_name')
+    player2_name = data.get('player2_name', None)
 
     try:
         int_generator_api_url = None
@@ -60,9 +58,18 @@ def create_game():
                 spaces = 7
 
         res = requests.get(int_generator_api_url)
-        generated_numbers = res.text.replace("\t", "").split("\n")
-        selected_num = random.choice(generated_numbers)
+        selected_num = res.text.replace("\t", "").replace("\n", "")
 
+        #  TODO: NEED TO ADD SOME KIND OF RECURSIVE CALL TO CALL UNTIL THE SPACES ARE ACTUALLY THE NUMBER NEEDED.
+        if len(selected_num) != spaces:
+            return jsonify("Uh oh, Something happened. Please try again.")
+
+        string_num = selected_num
+        int_num = int(selected_num)
+
+        # TODO; CHANGE DB TYPE FOR NUM TO GUESS TO STRING.
+
+        print("world")
         # Initiate GAME IN DB
         game = Game.create_game(
             number_to_guess=selected_num,
