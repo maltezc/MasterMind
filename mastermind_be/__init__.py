@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask_cors import CORS
 
 from mastermind_be.attempts.routes import attempts_routes
 from mastermind_be.database import connect_db
@@ -15,6 +16,7 @@ app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+CORS(app)
 
 connect_db(app)
 

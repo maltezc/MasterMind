@@ -118,6 +118,7 @@ class Game(db.Model):
             "player2_name": self.player2_name,
             "player2_guesses_count": self.player2_guesses_count,
             "multiplayer": self.multiplayer,
+            "players_count": self.players_count,
             "winner": self.winner,
             "status": self.status,
             "datetime_created": self.datetime_created,

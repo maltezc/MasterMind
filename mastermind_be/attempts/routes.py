@@ -35,7 +35,7 @@ def make_an_attempt(game_uid):
         game_serialized = game.serialize()
 
         game_winner = "No one" if game.winner is None else game.winner
-        message = f"This game is already completed. {game_winner} won! Please make a guess on another game."
+        message = f"{game_winner} won! Please make a guess on another game."
         return jsonify(game=game_serialized, message=message), 200
 
     check_spaces_vs_guessed_length(game, guessed_number, game.spaces)
