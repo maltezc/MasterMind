@@ -21,12 +21,14 @@ def guessed_is_digit(game, guessed_number):
 
 
 # TODO: ERROR IN BLOCK BELOW WHEN GUESSED NUMBER HAS MORE SPACES THAN GAME NUM.
-def check_spaces_vs_guessed_length(game, guessed_number, spaces):
+def spaces_in_range(game, guessed_number, spaces):
     """Checks if spaces match the length of the number guessed. Returns an error if they dont match."""
 
     if len(guessed_number) != spaces:
         message = f"Guess must be {spaces} numbers long!"
-        return jsonify(game=game, message=message)
+        return message
+        # serialized_game = game.serialize()
+        # return jsonify(game=serialized_game, message=message)
 
 
 def check_is_draw(game, attempts_count, attempts_max):
