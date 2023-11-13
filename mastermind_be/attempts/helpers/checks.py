@@ -6,10 +6,18 @@ from werkzeug.exceptions import NotFound, abort
 def guessed_is_digit(game, guessed_number):
     """Checks if guessed input is a digit and returns error if not."""
 
-    if not guessed_number.isdigit():
+    # TODO: GUESS IS NOW STRING AND NEEDS TO BE CHECKED HERE.
+    try:
+        parsed_value = int(guessed_number)
+    except ValueError:
         message = "Not a valid number"
-        # return abort(400, "Not a valid number")
         return jsonify(game=game, message=message)
+
+
+    # if not guessed_number.isdigit():
+    #     message = "Not a valid number"
+    #     # return abort(400, "Not a valid number")
+    #     return jsonify(game=game, message=message)
 
 
 # TODO: ERROR IN BLOCK BELOW WHEN GUESSED NUMBER HAS MORE SPACES THAN GAME NUM.

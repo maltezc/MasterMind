@@ -71,10 +71,10 @@ class Game(db.Model):
         parsed_value = int(value)
         if 4 > parsed_value > 7:
             raise ValueError("Number to guess must be between 4 and 7")
-        return parsed_value
+        return value
 
     number_to_guess = db.Column(
-        db.Integer,
+        db.String(7),
         nullable=False
     )
 
