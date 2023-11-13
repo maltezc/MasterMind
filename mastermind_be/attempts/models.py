@@ -23,7 +23,7 @@ class Attempt(db.Model):
     game = db.relationship('Game', back_populates='attempts', uselist=False)
 
     guess = db.Column(
-        db.Integer,
+        db.String(7),
         nullable=False
     )
 
@@ -34,13 +34,22 @@ class Attempt(db.Model):
 
     @validates("guess")
     def validate_guess(self, key, value):
-        """Validates guess is a whole number and doesnt contain any special characters """
+        """Validates guess is a whole number and doesn't contain any special characters """
 
-        if not type(value) == int:
-        # if not value.isdigit():
-            raise ValueError("Number to guess must be a number.")
-        parsed_value = int(value)
-        return parsed_value
+        try:
+            parsed_value = int(value)
+        except ValueError:
+            raise ValueError("Value entered is not a number.")
+
+        if 4 > len(value) > 7:
+            raise ValueError("Number to guess must be between 4 and 7")
+        return value
+
+        # if not type(value) == int:
+        # # if not value.isdigit():
+        #     raise ValueError("Number to guess must be a number.")
+        # parsed_value = int(value)
+        # return parsed_value
 
     datetime_created = db.Column(
         db.DateTime,

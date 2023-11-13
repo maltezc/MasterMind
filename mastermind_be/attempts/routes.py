@@ -21,7 +21,7 @@ def make_an_attempt(game_uid):
     guessed_number = data.get("guess")
 
     try:
-        valid_guess = int(guessed_number)
+        int(guessed_number)
     except ValueError as error:
         return jsonify("The value you entered is not considered an integer. Please enter a value only containing "
                        "numbers.")
@@ -49,7 +49,7 @@ def make_an_attempt(game_uid):
     [player1, player2] = set_game_info(game)
 
     try:
-        [game_serialized, message] = handle_attempts(game, attempts_count, attempts_max, player1, player2, valid_guess)
+        [game_serialized, message] = handle_attempts(game, attempts_count, attempts_max, player1, player2, guessed_number)
         return jsonify(game=game_serialized, message=message), 201
 
     except ValueError:

@@ -60,7 +60,6 @@ def create_game():
         res = requests.get(int_generator_api_url)
         selected_num = res.text.replace("\t", "").replace("\n", "")
 
-        #  TODO: NEED TO ADD SOME KIND OF RECURSIVE CALL TO CALL UNTIL THE SPACES ARE ACTUALLY THE NUMBER NEEDED.
         if len(selected_num) != spaces:
             return jsonify("Uh oh, Something happened. Please try again.")
 
@@ -69,7 +68,6 @@ def create_game():
 
         # TODO; CHANGE DB TYPE FOR NUM TO GUESS TO STRING.
 
-        print("world")
         # Initiate GAME IN DB
         game = Game.create_game(
             number_to_guess=selected_num,
