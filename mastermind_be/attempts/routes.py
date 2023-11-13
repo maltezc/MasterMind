@@ -2,7 +2,7 @@
 
 from flask import Blueprint, jsonify, request
 
-from mastermind_be.attempts.helpers.checks import check_is_draw, check_spaces_vs_guessed_length, guessed_is_digit
+from mastermind_be.attempts.helpers.checks import check_is_draw, spaces_in_range, guessed_is_digit
 from mastermind_be.attempts.helpers.general import set_multiplayer_game_info, handle_attempts, return_other_games, \
     set_single_player_game_info, set_game_info
 from mastermind_be.attempts.models import Attempt
@@ -20,16 +20,20 @@ def make_an_attempt(game_uid):
     data = request.json
     guessed_number = data.get("guess")
 
-    try:
-        int(guessed_number)
-    except ValueError as error:
-        return jsonify("The value you entered is not considered an integer. Please enter a value only containing "
-                       "numbers.")
-
     game = Game.query.get(game_uid)
     if game is None:
         message = return_other_games(game_uid)
         return jsonify(message)
+
+    try:
+        value = int(guessed_number)
+        if value < 0:
+            raise ValueError
+    except ValueError as error:
+        message = ("The value you entered is not considered an integer. Please enter a positve value only containing "
+                   "numbers.")
+        game_serialized = game.serialize()
+        return jsonify(game=game_serialized, message=message), 200
 
     if game.status == "COMPLETED":
         game_serialized = game.serialize()
@@ -38,7 +42,11 @@ def make_an_attempt(game_uid):
         message = f"{game_winner} won! Please make a guess on another game."
         return jsonify(game=game_serialized, message=message), 200
 
-    check_spaces_vs_guessed_length(game, guessed_number, game.spaces)
+    message = spaces_in_range(game, guessed_number, game.spaces)
+    if message:
+        game_serialized = game.serialize()
+        return jsonify(game=game_serialized, message=message), 200
+
     guessed_is_digit(game, guessed_number)
 
     attempts_max = game.players_count * 10
