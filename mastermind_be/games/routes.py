@@ -9,6 +9,8 @@ from mastermind_be.games.helpers.general import nuke_db, return_active_games
 from mastermind_be.games.models import Game
 import random
 
+from mastermind_be.users.models import User
+
 games_routes = Blueprint('games_routes', __name__)
 
 easy = {
@@ -21,8 +23,8 @@ medium = {"url": "https://www.random.org/integers/?num=5&min=0&max=7&col=5&base=
           }
 
 hard = {"url": "https://www.random.org/integers/?num=6&min=0&max=7&col=6&base=10&format=plain&rnd=new",
-          "spaces": "6"
-          }
+        "spaces": "6"
+        }
 
 legendary = {"url": "https://www.random.org/integers/?num=7&min=0&max=7&col=7&base=10&format=plain&rnd=new",
              "spaces": "7"
@@ -66,15 +68,24 @@ def create_game():
         string_num = selected_num
         int_num = int(selected_num)
 
-        # TODO; CHANGE DB TYPE FOR NUM TO GUESS TO STRING.
+        users = []
+
+        player1 = User.query.filter(User.name == "player1_name").first()
+        users.append(player1)
+
+        if player2_name is not None:
+            player2 = User.query.filter(User.name == "player2_name").first()
+            users.append(player2)
 
         # Initiate GAME IN DB
+
         game = Game.create_game(
             number_to_guess=selected_num,
             spaces=spaces,
             difficulty=difficulty,
-            player1_name=player1_name,
-            player2_name=player2_name,
+            # users=users
+            # player1_name=player1_name,
+            # player2_name=player2_name,
         )
 
         serialized = game.serialize()
@@ -89,7 +100,6 @@ def create_game():
 def get_game(game_uid):
     """Retrieves single game by uid from db"""
 
-    # TODO: add user if time.
     game = Game.query.get_or_404(game_uid)
 
     serialized = game.serialize()

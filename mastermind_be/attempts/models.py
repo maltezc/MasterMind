@@ -22,15 +22,27 @@ class Attempt(db.Model):
     )
     game = db.relationship('Game', back_populates='attempts', uselist=False)
 
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="CASCADE")
+    )
+    user = db.relationship('User', back_populates='attempts', uselist=False)
+
     guess = db.Column(
         db.String(7),
         nullable=False
     )
 
-    player_name = db.Column(
-        db.Text,
+    winning_attempt = db.Column(
+        db.Boolean,
         nullable=False,
+        default=False
     )
+
+    # player_name = db.Column(
+    #     db.Text,
+    #     nullable=False,
+    # )
 
     @validates("guess")
     def validate_guess(self, key, value):
@@ -44,12 +56,6 @@ class Attempt(db.Model):
         if 4 > len(value) > 7:
             raise ValueError("Number to guess must be between 4 and 7")
         return value
-
-        # if not type(value) == int:
-        # # if not value.isdigit():
-        #     raise ValueError("Number to guess must be a number.")
-        # parsed_value = int(value)
-        # return parsed_value
 
     datetime_created = db.Column(
         db.DateTime,
@@ -69,19 +75,22 @@ class Attempt(db.Model):
             "id": self.id,
             "game_id": self.game_id,
             "guess": self.guess,
-            "player_name": self.player_name,
+            # "player_name": self.player_name,
+            "user_id": self.user_id,
+            "winning_attempt": self.winning_attempt,
             "datetime_created": self.datetime_created,
             "hint": self.hint
         }
 
     @classmethod
-    def make_attempt(cls, game_id, guess, player_name, hint):
+    def make_attempt(cls, game_id, guess, player_id, hint):
         """Makes a guessing attempt"""
 
         attempt = Attempt(
             game_id=game_id,
             guess=guess,
-            player_name=player_name,
+            player_id=player_id,
+            # player_name=player_name,
             hint=hint
         )
 

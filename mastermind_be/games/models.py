@@ -1,8 +1,6 @@
 """games models"""
 from datetime import datetime
-
 from sqlalchemy.orm import validates
-
 from mastermind_be.database import db
 
 
@@ -17,27 +15,29 @@ class Game(db.Model):
         primary_key=True,
     )
 
-    player1_name = db.Column(
-        db.Text,
-        nullable=False
-    )
+    users = db.Relationship("User", back_populates="game", uselist=True)
 
-    player1_guesses_count = db.Column(
-        db.Integer,
-        nullable=False,
-        default=0
-    )
+    # player1_name = db.Column(
+    #     db.Text,
+    #     nullable=False
+    # )
 
-    player2_name = db.Column(
-        db.Text,
-        nullable=True
-    )
+    # player1_guesses_count = db.Column(
+    #     db.Integer,
+    #     nullable=False,
+    #     default=0
+    # )
 
-    player2_guesses_count = db.Column(
-        db.Integer,
-        nullable=False,
-        default=0
-    )
+    # player2_name = db.Column(
+    #     db.Text,
+    #     nullable=True
+    # )
+
+    # player2_guesses_count = db.Column(
+    #     db.Integer,
+    #     nullable=False,
+    #     default=0
+    # )
 
     # TODO: SET enums for status. ACTIVE, COMPLETED
     status = db.Column(
@@ -47,10 +47,10 @@ class Game(db.Model):
         default="ACTIVE"
     )
 
-    winner = db.Column(
-        db.Text,
-        nullable=True,
-    )
+    # winner = db.Column(
+    #     db.Text,
+    #     nullable=True,
+    # )
 
     spaces = db.Column(
         db.Integer,
@@ -78,11 +78,11 @@ class Game(db.Model):
         nullable=False
     )
 
-    players_count = db.Column(
-        db.Integer,
-        nullable=False,
-        default=1
-    )
+    # players_count = db.Column(
+    #     db.Integer,
+    #     nullable=False,
+    #     default=1
+    # )
 
     multiplayer = db.Column(
         db.Boolean,
@@ -113,13 +113,13 @@ class Game(db.Model):
             "number_to_guess": self.number_to_guess,
             "spaces": self.spaces,
             "difficulty": self.difficulty,
-            "player1_name": self.player1_name,
-            "player1_guesses_count": self.player1_guesses_count,
-            "player2_name": self.player2_name,
-            "player2_guesses_count": self.player2_guesses_count,
+            # "player1_name": self.player1_name,
+            # "player1_guesses_count": self.player1_guesses_count,
+            # "player2_name": self.player2_name,
+            # "player2_guesses_count": self.player2_guesses_count,
             "multiplayer": self.multiplayer,
-            "players_count": self.players_count,
-            "winner": self.winner,
+            # "players_count": self.players_count,
+            # "winner": self.winner,
             "status": self.status,
             "datetime_created": self.datetime_created,
             "datetime_completed": self.datetime_completed,
@@ -127,39 +127,45 @@ class Game(db.Model):
         }
 
     @classmethod
-    def create_game(cls, number_to_guess, spaces, difficulty, player1_name, player2_name):
+    def create_game(cls, number_to_guess, spaces, difficulty, users):
         """Instantiates a game with a number to guess"""
 
         game = Game(
             number_to_guess=number_to_guess,
             spaces=spaces,
             difficulty=difficulty,
-            player1_name=player1_name,
-            player2_name=player2_name
+            # users=users
+            # player1_name=player1_name,
+            # player2_name=player2_name
         )
 
         db.session.add(game)
         db.session.commit()
 
-        return game
+        for user in users:
+            game.users.append(user)
 
-    @staticmethod
-    def player1_increment_guess(game):
-        """Static Method to Increment player1 guesses on a game."""
-
-        game.player1_guesses_count += 1
-        db.session.commit()
+        db.commit()
 
         return game
 
-    @staticmethod
-    def player2_increment_guess(game):
-        """Static Method to Increment player2 guesses on a game."""
+    # @staticmethod
+    # def player1_increment_guess(game):
+    #     """Static Method to Increment player1 guesses on a game."""
+    #
+    #     game.player1_guesses_count += 1
+    #     db.session.commit()
+    #
+    #     return game
 
-        game.player2_guesses_count += 1
-        db.session.commit()
-
-        return game
+    # @staticmethod
+    # def player2_increment_guess(game):
+    #     """Static Method to Increment player2 guesses on a game."""
+    #
+    #     game.player2_guesses_count += 1
+    #     db.session.commit()
+    #
+    #     return game
 
     @staticmethod
     def set_status_completed(game):
@@ -172,14 +178,14 @@ class Game(db.Model):
 
         return game
 
-    @staticmethod
-    def set_winner_user1(game, player_name):
-        """Sets the winner to user1"""
-
-        game.winner = player_name
-        db.session.commit()
-
-        return game
+    # @staticmethod
+    # def set_winner_user1(game, user_id):
+    #     """Sets the winner to user1"""
+    #
+    #     game.winner = user_id
+    #     db.session.commit()
+    #
+    #     return game
 
 # user table
 
