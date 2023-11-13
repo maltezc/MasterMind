@@ -71,6 +71,8 @@ class Attempt(db.Model):
     def serialize(self):
         """Returns self"""
 
+        # TODO: ADD DEPTH CONTROLLER
+
         return {
             "id": self.id,
             "game_id": self.game_id,

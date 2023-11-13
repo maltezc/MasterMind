@@ -45,6 +45,7 @@ class User(db.Model):
         serialized_attempts = [attempt.serialize() for attempt in self.user.attempts]
         serialized_games = [game.serialize() for game in self.user.games]
 
+        # TODO: ADD DEPTH CONTROLLER
         return {
             "id": self.id,
             "name": self.name,

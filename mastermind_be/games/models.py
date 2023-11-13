@@ -108,6 +108,8 @@ class Game(db.Model):
 
         serialized_attempts = [attempt.serialize() for attempt in self.attempts]
 
+        # TODO: ADD DEPTH CONTROLLER
+
         return {
             "id": self.id,
             "number_to_guess": self.number_to_guess,
