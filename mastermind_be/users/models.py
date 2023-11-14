@@ -34,7 +34,10 @@ class User(db.Model):
     # can filter for this
 
     # games
-    games = db.Relationship("Game", back_populates="user", uselist=True)
+    player1_games = db.Relationship("Game", back_populates="player1", foreign_keys="Game.player1_id", uselist=True)
+    player2_games = db.Relationship("Game", back_populates="player2", foreign_keys="Game.player2_id", uselist=True)
+
+    # games = db.Relationship("Game", back_populates="user", foreign_keys="[Game.player1_id], [Game.player2_id]", uselist=True)
 
     # attempts
     attempts = db.Relationship("Attempt", back_populates="user", uselist=True)
@@ -70,3 +73,5 @@ class User(db.Model):
         db.session.commit()
 
         return user
+
+

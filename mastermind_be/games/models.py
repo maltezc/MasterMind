@@ -15,7 +15,21 @@ class Game(db.Model):
         primary_key=True,
     )
 
-    users = db.Relationship("User", back_populates="games", uselist=True)
+    player1_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=True
+    )
+    player1 = db.relationship('User', back_populates='player1_games', foreign_keys=[player1_id], uselist=False)
+
+    player2_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=True
+    )
+    player2 = db.relationship('User', back_populates='player2_games', foreign_keys=[player2_id], uselist=False)
+
+    # users = db.Relationship("User", back_populates="games", uselist=True)
 
     # player1_name = db.Column(
     #     db.Text,
@@ -44,7 +58,7 @@ class Game(db.Model):
         db.Text,
         # SQLAlchemyEnum(GameStatusEnum, name='game_status_enum'),
         nullable=False,
-        default="ACTIVE"
+        default="SETUP"
     )
 
     # winner = db.Column(
@@ -113,6 +127,8 @@ class Game(db.Model):
             "number_to_guess": self.number_to_guess,
             "spaces": self.spaces,
             "difficulty": self.difficulty,
+            "player1_id": self.player1_id,
+            "player2_id": self.player2_id,
             # "player1_name": self.player1_name,
             # "player1_guesses_count": self.player1_guesses_count,
             # "player2_name": self.player2_name,
@@ -126,16 +142,14 @@ class Game(db.Model):
             "attempts": serialized_attempts
         }
 
-        if deep:
-            serialized_users = [user.serialize(False) for user in self.users]
-            game_data["users"] = serialized_users
+        # if deep:
+        #     serialized_users = [user.serialize(False) for user in self.users]
+        #     game_data["users"] = serialized_users
 
         return game_data
 
-
-
     @classmethod
-    def create_game(cls, number_to_guess, spaces, difficulty, users):
+    def create_game(cls, number_to_guess, spaces, difficulty):
         """Instantiates a game with a number to guess"""
 
         game = Game(
@@ -150,10 +164,40 @@ class Game(db.Model):
         db.session.add(game)
         db.session.commit()
 
-        for user in users:
-            game.users.append(user)
+        # for user in users:
+        #     game.users.append(user)
+        #
+        # db.commit()
 
-        db.commit()
+        return game
+
+    @staticmethod
+    def add_user_to_game(game_id, user):
+        """adds a player to the game"""
+
+        game = Game.query.get_or_404(game_id)
+        if game.player1 is None:
+            game.player1 = user
+        elif game.player2 is None:
+            game.player2 = user
+            game.multiplayer = True
+        else:
+            return "No more players can be added to this game."
+
+        db.session.commit()
+
+        return game
+
+    @staticmethod
+    def start_game(game):
+        """Sets the game status to ACTIVE"""
+
+        if game.status == "COMPLETED":
+            return None
+
+        game.status = "ACTIVE"
+
+        db.session.commit()
 
         return game
 
@@ -196,5 +240,3 @@ class Game(db.Model):
     #     return game
 
 # user table
-
-

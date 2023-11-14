@@ -38,8 +38,8 @@ def create_game():
 
     data = request.json
     difficulty = data.get("difficulty", "easy")
-    player1_name = data.get('player1_name')
-    player2_name = data.get('player2_name', None)
+    # player1_name = data.get('player1_name')
+    # player2_name = data.get('player2_name', None)
 
     try:
         int_generator_api_url = None
@@ -68,14 +68,14 @@ def create_game():
         string_num = selected_num
         int_num = int(selected_num)
 
-        users = []
+        # users = []
+        #
+        # player1 = User.query.filter(User.name == "player1_name").first()
+        # users.append(player1)
 
-        player1 = User.query.filter(User.name == "player1_name").first()
-        users.append(player1)
-
-        if player2_name is not None:
-            player2 = User.query.filter(User.name == "player2_name").first()
-            users.append(player2)
+        # if player2_name is not None:
+        #     player2 = User.query.filter(User.name == "player2_name").first()
+        #     users.append(player2)
 
         # Initiate GAME IN DB
 
@@ -93,6 +93,31 @@ def create_game():
 
     except ValueError:
         abort(500, description="Failed to create game.")
+
+
+@games_routes.post("/<int:game_uid>/add_user/<int:user_uid>")
+def add_user_to_game(game_uid, user_uid):
+    """Adds a user to a game"""
+
+    game = Game.query.get(game_uid, None)
+
+    if game is None:
+        return jsonify("Game does not exist.")
+    if game.player1 and game.player2:
+        return jsonify("Cannot add any more players")
+    if game.status != "SETUP":
+        return jsonify("Game is not in setup mode anymore.")
+
+    user = User.query.get(user_uid, None)
+    if user is None:
+        return jsonify("User does not exist.")
+
+    if game.player1 is None:
+        game.player1 = user
+    elif game.player2 is None:
+        game.player2 = user
+
+    return game
 
 
 # Read
@@ -140,6 +165,19 @@ def get_completed_games():
 
 
 # Update
+@games_routes.patch("<int:game_uid>")
+def start_game(game_uid):
+    """Changes the game status to active"""
+
+    game = Game.query.get(game_uid, None)
+    if game is None:
+        return jsonify("Game does not exist.")
+
+    Game.start_game(game)
+
+    return game
+
+
 # none
 
 # Delete
