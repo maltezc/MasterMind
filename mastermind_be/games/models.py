@@ -15,7 +15,7 @@ class Game(db.Model):
         primary_key=True,
     )
 
-    users = db.Relationship("User", back_populates="game", uselist=True)
+    users = db.Relationship("User", back_populates="games", uselist=True)
 
     # player1_name = db.Column(
     #     db.Text,
