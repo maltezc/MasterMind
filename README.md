@@ -11,14 +11,19 @@
    - SECRET_KEY=anything_you_want
    - DATABASE_URL=postgresql:///mastermind_be
    - FLASK_APP=mastermind_be
-   
-5) Install requirements.txt: 
+5) Install Setup Tools
+   1) `pip install -U pip setuptools`
+6) Install requirements.txt: 
    1) `pip3 install -r requirements.txt `
-6) Run `flask --app mastermind_be run` in outer mastermind_be
+7) Run `flask --app mastermind_be run` in outer mastermind_be
 
 ### For latest in-progress work - adding multilayer functionality: 
    - `git fetch`
    - `git checkout 38-add-multi-player-functionality `
+
+### Insomnia Routes
+   - You can import insomnia routes from file: `Mastermind_Insomnia_Routes.json`
+   
 
 ### Bug Journal
 - Working with new BluePrint version and setting up.
