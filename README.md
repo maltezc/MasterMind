@@ -3,16 +3,22 @@
 
 # how to run: 
 1) Clone repo
+   1) `git clone https://github.com/maltezc/MasterMind-BE.git`
 2) Create psql database: `mastermind_be`
-3) Set up virtualenv inside mastermind_be folder
+   1) `CREATE DATABASE mastermind_be;`
+3) Set up virtualenv inside inner mastermind_be folder
 4) Set Env variables: 
    - SECRET_KEY=anything_you_want
    - DATABASE_URL=postgresql:///mastermind_be
    - FLASK_APP=mastermind_be
    
-5) Install requirements.txt with `pip3 install -r requirements.txt `
+5) Install requirements.txt: 
+   1) `pip3 install -r requirements.txt `
 6) Run `flask --app mastermind_be run` in outer mastermind_be
 
+### For latest in-progress work - adding multilayer functionality: 
+   - `git fetch`
+   - `git checkout 38-add-multi-player-functionality `
 
 ### Bug Journal
 - Working with new BluePrint version and setting up.
