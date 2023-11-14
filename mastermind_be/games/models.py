@@ -103,14 +103,12 @@ class Game(db.Model):
 
     attempts = db.Relationship("Attempt", back_populates="game", uselist=True)
 
-    def serialize(self):
+    def serialize(self, deep=True):
         """returns self"""
 
         serialized_attempts = [attempt.serialize() for attempt in self.attempts]
 
-        # TODO: ADD DEPTH CONTROLLER
-
-        return {
+        game_data = {
             "id": self.id,
             "number_to_guess": self.number_to_guess,
             "spaces": self.spaces,
@@ -127,6 +125,14 @@ class Game(db.Model):
             "datetime_completed": self.datetime_completed,
             "attempts": serialized_attempts
         }
+
+        if deep:
+            serialized_users = [user.serialize(False) for user in self.users]
+            game_data["users"] = serialized_users
+
+        return game_data
+
+
 
     @classmethod
     def create_game(cls, number_to_guess, spaces, difficulty, users):

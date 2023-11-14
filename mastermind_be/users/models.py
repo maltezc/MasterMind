@@ -3,7 +3,7 @@
 from datetime import datetime
 from sqlalchemy.orm import validates
 
-from mastermind_be import db
+from mastermind_be.database import db
 
 
 class User(db.Model):
@@ -39,19 +39,24 @@ class User(db.Model):
     # attempts
     attempts = db.Relationship("Attempt", back_populates="user", uselist=True)
 
-    def serialize(self):
+    def serialize(self, deep=True):
         """returns self"""
 
         serialized_attempts = [attempt.serialize() for attempt in self.user.attempts]
-        serialized_games = [game.serialize() for game in self.user.games]
 
-        # TODO: ADD DEPTH CONTROLLER
-        return {
+        user_data = {
             "id": self.id,
             "name": self.name,
-            "games": serialized_games,
             "attempts": serialized_attempts
         }
+
+        # if include_orders:
+        #     user_data['orders'] = [order.serialize(include_user=False) for order in self.orders]
+        if deep:
+            serialized_games = [game.serialize() for game in self.user.games]
+            user_data["games"] = serialized_games
+
+        return user_data
 
     @classmethod
     def create_user(cls, name):

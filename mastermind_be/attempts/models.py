@@ -71,9 +71,7 @@ class Attempt(db.Model):
     def serialize(self):
         """Returns self"""
 
-        # TODO: ADD DEPTH CONTROLLER
-
-        return {
+        attempt_data = {
             "id": self.id,
             "game_id": self.game_id,
             "guess": self.guess,
@@ -83,6 +81,8 @@ class Attempt(db.Model):
             "datetime_created": self.datetime_created,
             "hint": self.hint
         }
+
+        return attempt_data
 
     @classmethod
     def make_attempt(cls, game_id, guess, player_id, hint):

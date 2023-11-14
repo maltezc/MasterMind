@@ -26,6 +26,8 @@
 ### Refresh / New Topics
 - Static methods vs class methods
 - New Blueprint Version
+- Control Depth to prevent circular Serializations
+- 
 
 ### TODO
 - write tests
